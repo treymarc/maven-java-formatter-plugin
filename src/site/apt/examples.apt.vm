@@ -10,6 +10,20 @@ Examples
  Here are more examples of using the java formatter plugin.
  
  For more details on these parameters, see the {{{format-mojo.html}format goal}}
+ 
+* {Verbosity}
+
+If you do not want to see the list of the processed files:    
++---+
+<plugin>
+  <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+  <artifactId>maven-java-formatter-plugin</artifactId>
+  <version>${project.version}</version>
+  <configuration>
+    <verboseOutput>false</verboseOutput>
+  </configuration>
+</plugin>
++---+
 
 * {Setting Source Files}
 
