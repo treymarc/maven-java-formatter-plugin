@@ -78,7 +78,7 @@ import org.xml.sax.SAXException;
  */
 public class FormatterMojo extends AbstractMojo {
 	private static final String CACHE_PROPERTIES_FILENAME = "maven-java-formatter-cache.properties";
-	private static final String[] DEFAULT_INCLUDES = new String[] { "**/*.java" };
+	private static final String[] DEFAULT_INCLUDES = new String[]{"**/*.java"};
 
 	static final String LINE_ENDING_AUTO = "AUTO";
 	static final String LINE_ENDING_KEEP = "KEEP";
@@ -241,10 +241,11 @@ public class FormatterMojo extends AbstractMojo {
 
 		if (StringUtils.isEmpty(encoding)) {
 			encoding = ReaderFactory.FILE_ENCODING;
-			getLog().warn(
-					"File encoding has not been set, using platform encoding ("
-							+ encoding
-							+ ") to format source files, i.e. build is platform dependent!");
+			getLog()
+					.warn(
+							"File encoding has not been set, using platform encoding ("
+									+ encoding
+									+ ") to format source files, i.e. build is platform dependent!");
 		} else {
 			try {
 				"Test Encoding".getBytes(encoding);
@@ -252,8 +253,10 @@ public class FormatterMojo extends AbstractMojo {
 				throw new MojoExecutionException("Encoding '" + encoding
 						+ "' is not supported");
 			}
-			getLog().info(
-					"Using '" + encoding + "' encoding to format source files.");
+			getLog()
+					.info(
+							"Using '" + encoding
+									+ "' encoding to format source files.");
 		}
 
 		if (!LINE_ENDING_AUTO.equals(lineEnding)
@@ -299,7 +302,9 @@ public class FormatterMojo extends AbstractMojo {
 				boolean ok = formatFile(file, rc, hashCache, basedirPath);
 				if (verboseOutput) {
 					if (!ok && log.isErrorEnabled()) {
-						log.error(" * Failed  FILE : " + file.getAbsolutePath());
+						log
+								.error(" * Failed  FILE : "
+										+ file.getAbsolutePath());
 					} else if (log.isInfoEnabled()) {
 						log.info(" done : " + file.getAbsolutePath());
 					}
@@ -310,9 +315,13 @@ public class FormatterMojo extends AbstractMojo {
 
 			long endClock = System.currentTimeMillis();
 
-			log.info("Successfully formatted : " + rc.successCount + " file(s)");
+			log
+					.info("Successfully formatted : " + rc.successCount
+							+ " file(s)");
 			log.info("Fail to format         : " + rc.failCount + " file(s)");
-			log.info("Skipped                : " + rc.skippedCount + " file(s)");
+			log
+					.info("Skipped                : " + rc.skippedCount
+							+ " file(s)");
 			log.info("Approximate time taken : "
 					+ ((endClock - startClock) / 1000) + "s");
 		}
@@ -335,7 +344,7 @@ public class FormatterMojo extends AbstractMojo {
 
 		IncludeExcludeFileSelector fileSelector = new IncludeExcludeFileSelector();
 		fileSelector.setIncludes(DEFAULT_INCLUDES);
-		collection.setFileSelectors(new FileSelector[] { fileSelector });
+		collection.setFileSelectors(new FileSelector[]{fileSelector});
 	}
 
 	/**
@@ -585,8 +594,8 @@ public class FormatterMojo extends AbstractMojo {
 
 		InputStream configInput = null;
 		try {
-			resourceManager.addSearchPath(FileResourceLoader.ID,
-					basedir.getAbsolutePath());
+			resourceManager.addSearchPath(FileResourceLoader.ID, basedir
+					.getAbsolutePath());
 			configInput = resourceManager.getResourceAsInputStream(configFile);
 		} catch (ResourceNotFoundException e) {
 			throw new MojoExecutionException("Config file [" + configFile
