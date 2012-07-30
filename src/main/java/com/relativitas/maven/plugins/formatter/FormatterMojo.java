@@ -158,21 +158,21 @@ public class FormatterMojo extends AbstractMojo {
 	/**
 	 * Java compiler source version.
 	 * 
-	 * @parameter default-value="1.5" expression="${maven.compiler.source}"
+	 * @parameter default-value="1.6" expression="${maven.compiler.source}"
 	 */
 	private String compilerSource;
 
 	/**
 	 * Java compiler compliance version.
 	 * 
-	 * @parameter default-value="1.5" expression="${maven.compiler.source}"
+	 * @parameter default-value="1.6" expression="${maven.compiler.source}"
 	 */
 	private String compilerCompliance;
 
 	/**
 	 * Java compiler target version.
 	 * 
-	 * @parameter default-value="1.5" expression="${maven.compiler.target}"
+	 * @parameter default-value="1.6" expression="${maven.compiler.target}"
 	 */
 	private String compilerTargetPlatform;
 
