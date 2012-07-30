@@ -136,14 +136,6 @@ public class FormatterMojo extends AbstractMojo {
 	private File basedir;
 
 	/**
-	 * Location of the Java source files to format.
-	 * 
-	 * @parameter
-	 * @deprecated Use includes/excludes instead
-	 */
-	private File[] directories;
-
-	/**
 	 * List of fileset patterns for Java source locations to include in formatting.
 	 * Patterns are relative to the project source and test source directories.
 	 * When not specified, the default include is <code>**&#47;*.java</code>
@@ -264,7 +256,7 @@ public class FormatterMojo extends AbstractMojo {
 
 		createResourceCollection();
 		
-		List files = new ArrayList();
+		List<File> files = new ArrayList<File>();
 		try {
 			if (sourceDirectory != null && sourceDirectory.exists()
 					&& sourceDirectory.isDirectory()) {
@@ -333,8 +325,9 @@ public class FormatterMojo extends AbstractMojo {
 	 * @param files
 	 * @throws IOException
 	 */
-	void addCollectionFiles(List files) throws IOException {
-		Iterator resources = collection.getResources();
+	void addCollectionFiles(List<File> files) throws IOException {
+		@SuppressWarnings("unchecked")
+		Iterator<PlexusIoFileResource> resources = (Iterator<PlexusIoFileResource> )collection.getResources();
 		while(resources.hasNext()) {
 			  PlexusIoFileResource resource = (PlexusIoFileResource)resources.next();
 			  files.add(resource.getFile());
@@ -525,7 +518,7 @@ public class FormatterMojo extends AbstractMojo {
 	 * @throws MojoExecutionException
 	 */
 	private void createCodeFormatter() throws MojoExecutionException {
-		Map options = getFormattingOptions();
+		Map<String,String> options = getFormattingOptions();
 		formatter = ToolFactory.createCodeFormatter(options);
 	}
 
@@ -536,15 +529,15 @@ public class FormatterMojo extends AbstractMojo {
 	 * @return
 	 * @throws MojoExecutionException
 	 */
-	private Map getFormattingOptions() throws MojoExecutionException {
-		Map options = new HashMap();
+	private Map<String,String> getFormattingOptions() throws MojoExecutionException {
+		Map<String,String> options = new HashMap<String,String>();
 		options.put(JavaCore.COMPILER_SOURCE, compilerSource);
 		options.put(JavaCore.COMPILER_COMPLIANCE, compilerCompliance);
 		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM,
 				compilerTargetPlatform);
 
 		if (configFile != null) {
-			Map config = getOptionsFromConfigFile();
+			Map<String,String> config = getOptionsFromConfigFile();
 			if (Boolean.TRUE.equals(overrideConfigCompilerVersion)) {
 				config.remove(JavaCore.COMPILER_SOURCE);
 				config.remove(JavaCore.COMPILER_COMPLIANCE);
@@ -562,7 +555,7 @@ public class FormatterMojo extends AbstractMojo {
 	 * @return
 	 * @throws MojoExecutionException
 	 */
-	private Map getOptionsFromConfigFile() throws MojoExecutionException {
+	private Map<String,String> getOptionsFromConfigFile() throws MojoExecutionException {
 
 		InputStream configInput = null;
 		try {
