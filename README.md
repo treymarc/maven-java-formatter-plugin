@@ -3,6 +3,9 @@ maven-java-formatter-plugin
 
 fork from http://code.google.com/p/maven-java-formatter-plugin
 
+ver 0.4.2-SNAPSHOT
+======================
+- accept new configuration options for storing the "maven-java-formatter-cache.properties" file. If your are runing If you are running a "clean install" each time, this can be handy
 
 ver 0.4-SNAPSHOT
 ======================

@@ -127,6 +127,15 @@ public class FormatterMojo extends AbstractMojo {
 	private File targetDirectory;
 
 	/**
+	 * Set the directory for storing the "maven-java-formatter-cache.properties" file.
+	 * Default is target directory, so if your are runing If you are running a "clean install" each time, this can be handy
+	 *
+	 * @since 0.4.2
+	 * @parameter default-value=""
+	 */
+	private String cacheDirectory;
+
+	/**
 	 * Project's base directory.
 	 * 
 	 * @parameter expression="${basedir}"
@@ -368,41 +377,70 @@ public class FormatterMojo extends AbstractMojo {
 	}
 
 	private void storeFileHashCache(Properties props) {
-		File cacheFile = new File(targetDirectory, CACHE_PROPERTIES_FILENAME);
 		try {
-			OutputStream out = new BufferedOutputStream(new FileOutputStream(
-					cacheFile));
-			props.store(out, null);
-		} catch (FileNotFoundException e) {
-			log.warn("Cannot store file hash cache properties file", e);
-		} catch (IOException e) {
-			log.warn("Cannot store file hash cache properties file", e);
+			File cacheFile;
+			if (!"".equals(cacheDirectory)) {
+				cacheFile = new File(new File(cacheDirectory),
+						CACHE_PROPERTIES_FILENAME);
+			} else {
+				cacheFile = new File(targetDirectory, CACHE_PROPERTIES_FILENAME);
+			}
+
+			try {
+				OutputStream out = new BufferedOutputStream(
+						new FileOutputStream(cacheFile));
+				props.store(out, null);
+			} catch (FileNotFoundException e) {
+				log.warn("Cannot store file hash cache properties file", e);
+			} catch (IOException e) {
+				log.warn("Cannot store file hash cache properties file", e);
+			}
+		} catch (RuntimeException e) {
+			log.error("cacheDirectory is " + cacheDirectory);
+			log.error(e);
+			throw e;
 		}
 	}
 
 	private Properties readFileHashCacheFile() {
-		Properties props = new Properties();
-		if (!targetDirectory.exists()) {
-			targetDirectory.mkdirs();
-		} else if (!targetDirectory.isDirectory()) {
-			log.warn("Something strange here as the "
-					+ "supposedly target directory is not a directory.");
-			return props;
-		}
-
-		File cacheFile = new File(targetDirectory, CACHE_PROPERTIES_FILENAME);
-		if (!cacheFile.exists()) {
-			return props;
-		}
-
 		try {
-			props.load(new BufferedInputStream(new FileInputStream(cacheFile)));
-		} catch (FileNotFoundException e) {
-			log.warn("Cannot load file hash cache properties file", e);
-		} catch (IOException e) {
-			log.warn("Cannot load file hash cache properties file", e);
+			Properties props = new Properties();
+			File cacheFile;
+			if (!"".equals(cacheDirectory)) {
+				cacheFile = new File(new File(cacheDirectory),
+						CACHE_PROPERTIES_FILENAME);
+			} else {
+
+				if (!targetDirectory.exists()) {
+					targetDirectory.mkdirs();
+				} else if (!targetDirectory.isDirectory()) {
+					log.warn("Something strange here as the "
+							+ "supposedly target directory is not a directory.");
+					return props;
+				}
+
+				cacheFile = new File(targetDirectory, CACHE_PROPERTIES_FILENAME);
+			}
+
+			if (!cacheFile.exists()) {
+				return props;
+			}
+
+			try {
+				props.load(new BufferedInputStream(new FileInputStream(
+						cacheFile)));
+			} catch (FileNotFoundException e) {
+				log.warn("Cannot load file hash cache properties file", e);
+			} catch (IOException e) {
+				log.warn("Cannot load file hash cache properties file", e);
+			}
+			return props;
+
+		} catch (RuntimeException e) {
+			log.error("cacheDirectory is " + cacheDirectory);
+			log.error(e);
+			throw e;
 		}
-		return props;
 	}
 
 	/**
