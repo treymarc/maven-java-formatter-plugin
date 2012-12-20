@@ -80,11 +80,11 @@ public class FormatterMojo extends AbstractMojo {
 	private static final String CACHE_PROPERTIES_FILENAME = "maven-java-formatter-cache.properties";
 	private static final String[] DEFAULT_INCLUDES = new String[]{"**/*.java"};
 
-	static final String LINE_ENDING_AUTO = "AUTO";
-	static final String LINE_ENDING_KEEP = "KEEP";
-	static final String LINE_ENDING_LF = "LF";
-	static final String LINE_ENDING_CRLF = "CRLF";
-	static final String LINE_ENDING_CR = "CR";
+	private static final String LINE_ENDING_AUTO = "AUTO";
+	private static final String LINE_ENDING_KEEP = "KEEP";
+	private static final String LINE_ENDING_LF = "LF";
+	private static final String LINE_ENDING_CRLF = "CRLF";
+	private static final String LINE_ENDING_CR = "CR";
 
 	static final String LINE_ENDING_LF_CHAR = "\n";
 	static final String LINE_ENDING_CRLF_CHARS = "\r\n";
@@ -231,7 +231,7 @@ public class FormatterMojo extends AbstractMojo {
 	private CodeFormatter formatter;
 
 	private PlexusIoFileResourceCollection collection;
-
+	Log log = getLog();
 	/**
 	 * @see org.apache.maven.plugin.AbstractMojo#execute()
 	 */
@@ -241,11 +241,11 @@ public class FormatterMojo extends AbstractMojo {
 
 		if (StringUtils.isEmpty(encoding)) {
 			encoding = ReaderFactory.FILE_ENCODING;
-			getLog()
-					.warn(
-							"File encoding has not been set, using platform encoding ("
-									+ encoding
-									+ ") to format source files, i.e. build is platform dependent!");
+			log
+			.warn(
+					"File encoding has not been set, using platform encoding ("
+							+ encoding
+							+ ") to format source files, i.e. build is platform dependent!");
 		} else {
 			try {
 				"Test Encoding".getBytes(encoding);
@@ -253,10 +253,10 @@ public class FormatterMojo extends AbstractMojo {
 				throw new MojoExecutionException("Encoding '" + encoding
 						+ "' is not supported");
 			}
-			getLog()
-					.info(
-							"Using '" + encoding
-									+ "' encoding to format source files.");
+			log
+			.info(
+					"Using '" + encoding
+					+ "' encoding to format source files.");
 		}
 
 		if (!LINE_ENDING_AUTO.equals(lineEnding)
@@ -288,7 +288,7 @@ public class FormatterMojo extends AbstractMojo {
 		}
 
 		int numberOfFiles = files.size();
-		Log log = getLog();
+
 		log.info("Number of files to be formatted: " + numberOfFiles);
 
 		if (numberOfFiles > 0) {
@@ -303,8 +303,8 @@ public class FormatterMojo extends AbstractMojo {
 				if (verboseOutput) {
 					if (!ok && log.isErrorEnabled()) {
 						log
-								.error(" * Failed  FILE : "
-										+ file.getAbsolutePath());
+						.error(" * Failed  FILE : "
+								+ file.getAbsolutePath());
 					} else if (log.isInfoEnabled()) {
 						log.info(" done : " + file.getAbsolutePath());
 					}
@@ -316,14 +316,10 @@ public class FormatterMojo extends AbstractMojo {
 			long endClock = System.currentTimeMillis();
 
 			log
-					.info("Successfully formatted : " + rc.successCount
-							+ " file(s)");
+			.info("Successfully formatted : " + rc.successCount + " file(s)");
 			log.info("Fail to format         : " + rc.failCount + " file(s)");
-			log
-					.info("Skipped                : " + rc.skippedCount
-							+ " file(s)");
-			log.info("Approximate time taken : "
-					+ ((endClock - startClock) / 1000) + "s");
+			log.info("Skipped                : " + rc.skippedCount + " file(s)");
+			log.info("Approximate time taken : " + ((endClock - startClock) / 1000) + "s");
 		}
 	}
 
@@ -357,7 +353,7 @@ public class FormatterMojo extends AbstractMojo {
 	void addCollectionFiles(List<File> files) throws IOException {
 		@SuppressWarnings("unchecked")
 		Iterator<PlexusIoFileResource> resources = (Iterator<PlexusIoFileResource>) collection
-				.getResources();
+		.getResources();
 		while (resources.hasNext()) {
 			PlexusIoFileResource resource = (PlexusIoFileResource) resources
 					.next();
@@ -369,6 +365,7 @@ public class FormatterMojo extends AbstractMojo {
 		try {
 			return basedir.getCanonicalPath();
 		} catch (Exception e) {
+			log.warn(e);
 			return "";
 		}
 	}
@@ -380,15 +377,14 @@ public class FormatterMojo extends AbstractMojo {
 					cacheFile));
 			props.store(out, null);
 		} catch (FileNotFoundException e) {
-			getLog().warn("Cannot store file hash cache properties file", e);
+			log.warn("Cannot store file hash cache properties file", e);
 		} catch (IOException e) {
-			getLog().warn("Cannot store file hash cache properties file", e);
+			log.warn("Cannot store file hash cache properties file", e);
 		}
 	}
 
 	private Properties readFileHashCacheFile() {
 		Properties props = new Properties();
-		Log log = getLog();
 		if (!targetDirectory.exists()) {
 			targetDirectory.mkdirs();
 		} else if (!targetDirectory.isDirectory()) {
@@ -425,13 +421,13 @@ public class FormatterMojo extends AbstractMojo {
 			return true;
 		} catch (IOException e) {
 			rc.failCount++;
-			getLog().warn(e);
+			log.warn(e);
 		} catch (MalformedTreeException e) {
 			rc.failCount++;
-			getLog().warn(e);
+			log.warn(e);
 		} catch (BadLocationException e) {
 			rc.failCount++;
-			getLog().warn(e);
+			log.warn(e);
 		}
 		return false;
 	}
@@ -449,8 +445,9 @@ public class FormatterMojo extends AbstractMojo {
 	private void doFormatFile(File file, ResultCollector rc,
 			Properties hashCache, String basedirPath) throws IOException,
 			BadLocationException {
-		Log log = getLog();
-		log.debug("Processing file: " + file);
+		if (log.isDebugEnabled()){
+			log.debug("Processing file: " + file);
+		}
 		String code = readFileAsString(file);
 		String originalHash = md5hash(code);
 
@@ -459,20 +456,35 @@ public class FormatterMojo extends AbstractMojo {
 		String cachedHash = hashCache.getProperty(path);
 		if (cachedHash != null && cachedHash.equals(originalHash)) {
 			rc.skippedCount++;
-			log.debug("File is already formatted.");
+			if (log.isDebugEnabled()){
+				log.debug("File is already formatted.");
+			}
 			return;
 		}
 
 		String lineSeparator = getLineEnding(code);
-
-		TextEdit te = formatter.format(CodeFormatter.K_COMPILATION_UNIT, code,
+		TextEdit te = null;
+		Exception ex = null;
+try{
+		 te = formatter.format(CodeFormatter.K_COMPILATION_UNIT, code,
 				0, code.length(), 0, lineSeparator);
+}catch (Exception e) {
+	ex =e;
+}finally{
+	// got an error 
+	if (ex != null){
+		log.warn(ex);
+	}
+	// got no result
 		if (te == null) {
 			rc.skippedCount++;
-			log.debug("Code cannot be formatted. Possible cause "
-					+ "is unmatched source/target/compliance version.");
+			if (log.isDebugEnabled()){
+				log.debug("Code cannot be formatted. Possible cause "
+						+ "is unmatched source/target/compliance version.");
+			}
 			return;
 		}
+}
 
 		IDocument doc = new Document(code);
 		te.apply(doc);
@@ -482,7 +494,9 @@ public class FormatterMojo extends AbstractMojo {
 
 		if (originalHash.equals(formattedHash)) {
 			rc.skippedCount++;
-			log.debug("Equal hash code. Not writing result to file.");
+			if (log.isDebugEnabled()){
+				log.debug("Equal hash code. Not writing result to file.");
+			}
 			return;
 		}
 
