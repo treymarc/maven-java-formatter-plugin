@@ -19,7 +19,6 @@ package com.relativitas.maven.plugins.formatter.xml;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A class representing the profiles XML element in the Eclipse formatter config
@@ -31,7 +30,7 @@ public class Profiles {
 
 	public static final String PROFILE_KIND = "CodeFormatterProfile";
 
-	private List<Map<String, String>> profiles = new ArrayList<Map<String, String>>();
+	private List profiles = new ArrayList();
 
 	public Profiles() {
 	}
@@ -42,7 +41,7 @@ public class Profiles {
 		}
 	}
 
-	public List<Map<String, String>> getProfiles() {
+	public List getProfiles() {
 		return profiles;
 	}
 }

@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.digester.Digester;
 import org.xml.sax.SAXException;
 
-import com.relativitas.maven.plugins.I18n;
 import com.relativitas.maven.plugins.formatter.xml.Profiles;
 
 /**
@@ -48,26 +47,23 @@ public class ConfigReader {
 	 * @throws IOException
 	 * @throws ConfigReadException
 	 */
-	public Map<String, String> read(InputStream input) throws IOException,
-			SAXException, ConfigReadException {
-
+	public Map read(InputStream input) throws IOException, SAXException,
+			ConfigReadException {
 		Digester digester = new Digester();
 		digester.addRuleSet(new RuleSet());
 
 		Object result = digester.parse(input);
-
 		if (result == null && !(result instanceof Profiles)) {
 			throw new ConfigReadException("No profiles found in config file");
 		}
 
-		List<Map<String, String>> list = ((Profiles) result).getProfiles();
-
-		if ((list == null) || (list.size() == 0)) {
-			throw new ConfigReadException(I18n.format(
-					"No profile in config file of kind: {0} ",
-					Profiles.PROFILE_KIND));
+		Profiles profiles = (Profiles) result;
+		List list = profiles.getProfiles();
+		if (list.size() == 0) {
+			throw new ConfigReadException("No profile in config file of kind: "
+					+ Profiles.PROFILE_KIND);
 		}
 
-		return (Map<String, String>) list.get(0);
+		return (Map) list.get(0);
 	}
 }
