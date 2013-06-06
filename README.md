@@ -1,12 +1,12 @@
-maven-java-formatter-plugin
+java-formatter-maven-plugin
 ===========================
 
 fork from http://code.google.com/p/maven-java-formatter-plugin
 
 
-
 ver 0.4.2-SNAPSHOT
 ======================
+- name changed to java-formatter-maven-plugin , Artifact Ids of the format maven-___-plugin are reserved for plugins in the Group Id org.apache.maven.plugins
 - add some verbosity and debug for when variables are changed by other mojo (see http://code.google.com/p/maven-java-formatter-plugin/issues/detail?id=22)
 - using eclipse formatter version 3.8 instead of 3.5 (newer maven dependencies)
 - added back configuration option: directories, to allow formatting source files other than main and test, such as generated sources
