@@ -3,14 +3,17 @@ maven-java-formatter-plugin
 
 fork from http://code.google.com/p/maven-java-formatter-plugin
 
+
+
 ver 0.4.2-SNAPSHOT
 ======================
-- accept new configuration options for storing the "maven-java-formatter-cache.properties" file. If your are runing If you are running a "clean install" each time, this can be handy
+- using eclipse formatter version 3.8 instead of 3.5 (newer maven dependencies)
+- added back configuration option: directories, to allow formatting source files other than main and test, such as generated sources
+- accept new configuration options for storing the "maven-java-formatter-cache.properties" file. If you are running a "clean install" each time, this can be handy
 
 ver 0.4-SNAPSHOT
 ======================
-- accept new configuration options : verboseOutput will output full file names by default
-
+- accept new configuration options : verboseOutput 
 
 
 ver 0.3 (2011-03-01)

@@ -146,9 +146,11 @@ public class FormatterMojo extends AbstractMojo {
 
 	/**
 	 * Location of the Java source files to format.
+	 * Defaults to source main and test directories if not set.
+	 * Deprecated in version 0.3. Reintroduced in 0.4.
 	 * 
 	 * @parameter
-	 * @deprecated Use includes/excludes instead
+	 * @since 0.4
 	 */
 	private File[] directories;
 
@@ -240,7 +242,7 @@ public class FormatterMojo extends AbstractMojo {
 	/**
 	 * Will display all processed file , default to true
 	 * 
-	 * @parameter default-value="true"
+	 * @parameter default-value="false"
 	 * @since 0.2.0
 	 */
 	private Boolean verboseOutput;
@@ -284,6 +286,14 @@ public class FormatterMojo extends AbstractMojo {
 
 		List<File> files = new ArrayList<File>();
 		try {
+			if( directories != null ) {
+				for( File directory : directories ) {
+					if( directory.exists() && directory.isDirectory() ) {
+						collection.setBaseDir(directory);
+						addCollectionFiles(files);
+					}
+				}
+			} else { // Using defaults of source main and test dirs
 			if (sourceDirectory != null && sourceDirectory.exists()
 					&& sourceDirectory.isDirectory()) {
 				collection.setBaseDir(sourceDirectory);
@@ -501,8 +511,9 @@ public class FormatterMojo extends AbstractMojo {
 		TextEdit te = null;
 		Exception ex = null;
 		try {
-			te = formatter.format(CodeFormatter.K_COMPILATION_UNIT, code, 0,
-					code.length(), 0, lineSeparator);
+			// TODO make F_INCLUDE_COMMENTS an option
+			te = formatter.format(CodeFormatter.K_COMPILATION_UNIT + CodeFormatter.F_INCLUDE_COMMENTS, code,
+				0, code.length(), 0, lineSeparator);
 		} catch (Exception e) {
 			ex = e;
 		} finally {
