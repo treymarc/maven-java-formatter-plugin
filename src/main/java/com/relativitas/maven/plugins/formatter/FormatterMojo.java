@@ -77,7 +77,7 @@ import org.xml.sax.SAXException;
  * @author Matt Blanchette
  */
 public class FormatterMojo extends AbstractMojo {
-	private static final String CACHE_PROPERTIES_FILENAME = "maven-java-formatter-cache.properties";
+	private static final String CACHE_PROPERTIES_FILENAME = "java-formatter-maven-cache.properties";
 	private static final String[] DEFAULT_INCLUDES = new String[]{"**/*.java"};
 
 	static final String LINE_ENDING_AUTO = "AUTO";
@@ -304,6 +304,7 @@ public class FormatterMojo extends AbstractMojo {
 				collection.setBaseDir(testSourceDirectory);
 				addCollectionFiles(files);
 			}
+			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(
 					"Unable to find files using includes/excludes", e);
@@ -386,7 +387,7 @@ public class FormatterMojo extends AbstractMojo {
 		}
 	}
 
-	private void storeFileHashCache(Properties props) {
+	private void storeFileHashCache(Properties props) throws MojoExecutionException {
 		try {
 			File cacheFile;
 			if (!"".equals(cacheDirectory)) {
@@ -406,13 +407,11 @@ public class FormatterMojo extends AbstractMojo {
 				log.warn("Cannot store file hash cache properties file", e);
 			}
 		} catch (RuntimeException e) {
-			log.error("cacheDirectory is " + cacheDirectory);
-			log.error(e);
-			throw e;
+			throw new MojoExecutionException("cacheDirectory is " + cacheDirectory );		
 		}
 	}
 
-	private Properties readFileHashCacheFile() {
+	private Properties readFileHashCacheFile() throws MojoExecutionException {
 		try {
 			Properties props = new Properties();
 			File cacheFile;
@@ -447,9 +446,7 @@ public class FormatterMojo extends AbstractMojo {
 			return props;
 
 		} catch (RuntimeException e) {
-			log.error("cacheDirectory is " + cacheDirectory);
-			log.error(e);
-			throw e;
+				throw new MojoExecutionException("cacheDirectory is '" + cacheDirectory+"'", e);
 		}
 	}
 
@@ -458,9 +455,10 @@ public class FormatterMojo extends AbstractMojo {
 	 * @param rc
 	 * @param hashCache
 	 * @param basedirPath
+	 * @throws MojoExecutionException 
 	 */
 	private boolean formatFile(File file, ResultCollector rc,
-			Properties hashCache, String basedirPath) {
+			Properties hashCache, String basedirPath) throws MojoExecutionException {
 		try {
 			doFormatFile(file, rc, hashCache, basedirPath);
 			return true;
@@ -486,10 +484,12 @@ public class FormatterMojo extends AbstractMojo {
 	 * @param basedirPath
 	 * @throws IOException
 	 * @throws BadLocationException
+	 * @throws MojoExecutionException 
 	 */
 	private void doFormatFile(File file, ResultCollector rc,
 			Properties hashCache, String basedirPath) throws IOException,
-			BadLocationException {
+			BadLocationException, MojoExecutionException {
+
 		if (log.isDebugEnabled()) {
 			log.debug("Processing file: " + file);
 		}
@@ -497,7 +497,17 @@ public class FormatterMojo extends AbstractMojo {
 		String originalHash = md5hash(code);
 
 		String canonicalPath = file.getCanonicalPath();
-		String path = canonicalPath.substring(basedirPath.length());
+		log.debug("canonicalPath : "+canonicalPath);
+	
+		String path=null;
+		try{
+			
+
+		path = canonicalPath.substring(basedirPath.length());
+		}catch (Exception  e) {
+			log.debug("basedirPath : "+basedirPath);
+				throw new MojoExecutionException("something is wrong with ${basedir}, you should increase verbosity to DEBUG ");
+		}
 		String cachedHash = hashCache.getProperty(path);
 		if (cachedHash != null && cachedHash.equals(originalHash)) {
 			rc.skippedCount++;

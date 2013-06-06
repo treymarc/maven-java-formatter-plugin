@@ -7,6 +7,7 @@ fork from http://code.google.com/p/maven-java-formatter-plugin
 
 ver 0.4.2-SNAPSHOT
 ======================
+- add some verbosity and debug for when variables are changed by other mojo (see http://code.google.com/p/maven-java-formatter-plugin/issues/detail?id=22)
 - using eclipse formatter version 3.8 instead of 3.5 (newer maven dependencies)
 - added back configuration option: directories, to allow formatting source files other than main and test, such as generated sources
 - accept new configuration options for storing the "maven-java-formatter-cache.properties" file. If you are running a "clean install" each time, this can be handy
